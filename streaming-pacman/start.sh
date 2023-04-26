@@ -93,6 +93,8 @@ function start_demo {
     # Source demo-specific configurations
     source $PRJ_DIR/config/demo.cfg
 
+    echo "run_as_workshop=$run_as_workshop"
+
     source $UTILS_DIR/demo_helper.sh 
 
     validate_pre_reqs 
@@ -103,13 +105,12 @@ function start_demo {
 
     init_vars_from_tf_output
 
-    if [ "$run_as_workshop"="true" ]; then
+    if [ "$run_as_workshop" == "true" ]; then
         echo "Running as workshop, ksqlDB queries will not be run"
     else
         echo "Running as demo, ksqlDB queries will be created by this script now"
         create_ksqldb_app
     fi
-    
 
     welcome_screen
 
