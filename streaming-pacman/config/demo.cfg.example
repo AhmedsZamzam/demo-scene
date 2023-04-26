@@ -22,5 +22,8 @@ export TF_VAR_aws_profile="default"
 ###########      Optional Configs      ############
 ###################################################
 
-# These are optional configs
-# export S3_BUCKET_NAME="ksqldbpacman"
+# Fixed name for s3 bucket
+# export TF_VAR_s3_bucket_name="streaming-pacman-cc"
+
+# Skip ksqlDB query deploy
+# export run_as_workshop="true"

@@ -68,8 +68,6 @@ function validate_pre_reqs {
 
 function create_ksqldb_app {
 
-    init_vars_from_tf_output
-
     MAX_WAIT=720
     echo "Waiting up to $MAX_WAIT seconds for Confluent Cloud ksqlDB cluster $KSQLDB_ENDPOINT to be UP"
 
@@ -103,7 +101,15 @@ function start_demo {
 
     create_infra_with_tf
 
-    create_ksqldb_app
+    init_vars_from_tf_output
+
+    if [ "$run_as_workshop"="true" ]; then
+        echo "Running as workshop, ksqlDB queries will not be run"
+    else
+        echo "Running as demo, ksqlDB queries will be created by this script now"
+        create_ksqldb_app
+    fi
+    
 
     welcome_screen
 

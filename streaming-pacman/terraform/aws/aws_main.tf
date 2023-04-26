@@ -3,7 +3,7 @@
 ###########################################
 locals {
   resource_prefix = "${var.global_prefix}${random_string.random_string2.result}"
-  bucket_pacman = "%{ if var.bucket_name != "" }${var.bucket_name}%{ else }${var.global_prefix}${random_string.random_string.result}%{ endif }"
+  bucket_pacman = "%{ if var.s3_bucket_name != "" }${var.s3_bucket_name}%{ else }${var.global_prefix}${random_string.random_string.result}%{ endif }"
 }
 
 provider "aws" {

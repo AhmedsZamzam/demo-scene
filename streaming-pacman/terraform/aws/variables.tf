@@ -60,7 +60,7 @@ variable "global_prefix" {
   default = "streaming-pacman"
 }
 
-variable "bucket_name" {
+variable "s3_bucket_name" {
   type = string
   default = ""
 }
