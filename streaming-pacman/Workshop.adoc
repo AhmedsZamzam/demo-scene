@@ -17,12 +17,15 @@ To implement streaming analytics in the game we built a  link:statements.sql[sco
 * *AWS account* - This demo/Workshop runs on AWS
 
 == Step 1. Clone this repo
-First things first, clone this github repo to your local machine:
+First things first, clone this github repo to your local machine (Use your Terminal):
 +
 [source,bash]
 ----
-git clone --branch streaming-pacman-workshop --single-branch https://github.com/gianlucanatali/demo-scene.git
-
+git clone --branch streaming-pacman-workshop -n --depth=1 --filter=tree:0 https://github.com/gianlucanatali/demo-scene.git
+cd demo-scene
+git sparse-checkout set --no-cone streaming-pacman
+git checkout
+cd streaming-pacman
 ----
 
 
