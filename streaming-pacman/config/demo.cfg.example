@@ -26,4 +26,4 @@ export TF_VAR_aws_profile="default"
 # export TF_VAR_s3_bucket_name="streaming-pacman-cc"
 
 # Skip ksqlDB query deploy
-# export run_as_workshop="true"
+export run_as_workshop="true"
