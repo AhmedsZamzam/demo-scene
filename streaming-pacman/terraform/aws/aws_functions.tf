@@ -3,6 +3,7 @@
 ###########################################
 
 resource "null_resource" "build_functions" {
+  #if you enable this will conflict with the hash checking on the lambda function
   # triggers = {
   #   always_run = "${timestamp()}"
   # }
@@ -68,7 +69,13 @@ resource "aws_api_gateway_method_response" "event_handler_post_method_response" 
 resource "aws_api_gateway_deployment" "event_handler_v1" {
   depends_on = [aws_api_gateway_integration.event_handler_post_integration]
   rest_api_id = aws_api_gateway_rest_api.event_handler_api.id
-  stage_name = "v1"
+}
+
+resource "aws_api_gateway_stage" "event_handler_v1" {
+  depends_on = [aws_api_gateway_account.demo]
+  deployment_id = aws_api_gateway_deployment.event_handler_v1.id
+  rest_api_id   = aws_api_gateway_rest_api.event_handler_api.id
+  stage_name    = "v1"
 }
 
 ###########################################
@@ -109,6 +116,17 @@ resource "aws_api_gateway_method_response" "event_handler_options_method_respons
   }
 }
 
+resource "aws_api_gateway_method_settings" "event_handler_method_settings" {
+  rest_api_id = "${aws_api_gateway_rest_api.event_handler_api.id}"
+  stage_name  = "${aws_api_gateway_stage.event_handler_v1.stage_name}"
+  method_path = "*/*"
+  settings {
+    logging_level = "INFO"
+    data_trace_enabled = true
+    metrics_enabled = true
+  }
+}
+
 resource "aws_api_gateway_integration_response" "event_handler_options_integration_response" {
   depends_on = [aws_s3_bucket.pacman]
   rest_api_id = aws_api_gateway_rest_api.event_handler_api.id
@@ -126,45 +144,111 @@ resource "aws_api_gateway_integration_response" "event_handler_options_integrati
 ######### Event Handler Function ##########
 ###########################################
 
-resource "aws_iam_role_policy" "event_handler_role_policy" {
-  role = aws_iam_role.event_handler_role.name
-  policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Resource": [
-        "*"
-      ],
-      "Action": [
+resource "aws_api_gateway_account" "demo" {
+  cloudwatch_role_arn = aws_iam_role.cloudwatch.arn
+}
+
+data "aws_iam_policy_document" "assume_role_api_gateway" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["apigateway.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "cloudwatch" {
+  name               = "api_gateway_cloudwatch_global"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_api_gateway.json
+}
+
+data "aws_iam_policy_document" "cloudwatch" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams",
+      "logs:PutLogEvents",
+      "logs:GetLogEvents",
+      "logs:FilterLogEvents",
+    ]
+
+    resources = ["*"]
+  }
+}
+resource "aws_iam_role_policy" "cloudwatch" {
+  name   = "default"
+  role   = aws_iam_role.cloudwatch.id
+  policy = data.aws_iam_policy_document.cloudwatch.json
+}
+
+data "aws_iam_policy_document" "event_handler_role" {
+  statement {
+    effect    = "Allow"
+    actions   = [
         "logs:CreateLogGroup",
         "logs:CreateLogStream",
-        "logs:PutLogEvents"
+        "logs:PutLogEvents",
+        ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = [
+        "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath",
+        ]
+    resources = [
+      aws_ssm_parameter.origin_allowed.arn
       ]
-    }
-  ]
+  }
 }
-POLICY
+
+data "aws_iam_policy_document" "assume_role_Lambda_Service" {
+  statement  {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+resource "aws_iam_policy" "event_handler_role" {
+  name        = "event-handler-policy"
+  description = "A  policy for the event handler pacman"
+  policy      = data.aws_iam_policy_document.event_handler_role.json
+}
+
+resource "aws_iam_policy_attachment" "event_handler_role" {
+  name       = "event_handler_role-attachment"
+  roles      = [aws_iam_role.event_handler_role.name]
+  policy_arn = aws_iam_policy.event_handler_role.arn
 }
 
 resource "aws_iam_role" "event_handler_role" {
 
   name = "${local.resource_prefix}_event_handler_role"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
+  assume_role_policy = data.aws_iam_policy_document.assume_role_Lambda_Service.json
+
 }
-EOF
+
+resource "aws_ssm_parameter" "origin_allowed" {
+  name  = "${local.ssm_parameter_name}" 
+  type  = "String"
+  value = "https://${aws_cloudfront_distribution.pacman.domain_name}"
+  overwrite = true
 }
 
 resource "aws_lambda_function" "event_handler_function" {
@@ -175,7 +259,7 @@ resource "aws_lambda_function" "event_handler_function" {
   function_name = "${local.resource_prefix}_event_handler"
   description = "Backend function for the Event Handler API"
   filename = "functions/deploy/streaming-pacman-1.0.jar"
-  #source_code_hash = filemd5("functions/deploy/streaming-pacman-1.0.jar")
+  source_code_hash = filemd5("functions/deploy/streaming-pacman-1.0.jar")
   handler = "com.gnatali.streaming.pacman.EventHandler"
   role = aws_iam_role.event_handler_role.arn
   runtime = "java11"
@@ -183,7 +267,8 @@ resource "aws_lambda_function" "event_handler_function" {
   timeout = 60
   environment {
     variables = {
-      ORIGIN_ALLOWED = "http://${aws_s3_bucket_website_configuration.pacman.website_endpoint}"
+      //ORIGIN_ALLOWED = "https://${aws_cloudfront_distribution.pacman.domain_name}"
+      ORIGIN_ALLOWED_SSM_PARAM = local.ssm_parameter_name
       KSQLDB_ENDPOINT = confluent_ksql_cluster.main.rest_endpoint
       KSQLDB_API_AUTH_INFO = local.ksql_basic_auth_user_info
     }
@@ -195,7 +280,7 @@ resource "aws_lambda_permission" "event_handler_api_gateway_trigger" {
   action = "lambda:InvokeFunction"
   principal = "apigateway.amazonaws.com"
   function_name = aws_lambda_function.event_handler_function.function_name
-  source_arn = "${aws_api_gateway_rest_api.event_handler_api.execution_arn}/${aws_api_gateway_deployment.event_handler_v1.stage_name}/*"
+  source_arn = "${aws_api_gateway_rest_api.event_handler_api.execution_arn}/${aws_api_gateway_stage.event_handler_v1.stage_name}/*"
 }
 
 resource "aws_lambda_permission" "event_handler_cloudwatch_trigger" {

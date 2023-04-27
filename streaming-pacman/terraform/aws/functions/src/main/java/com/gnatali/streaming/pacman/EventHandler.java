@@ -1,8 +1,16 @@
 package com.gnatali.streaming.pacman;
 
-import java.util.Map;
+import static com.gnatali.streaming.pacman.utils.Constants.BODY_KEY;
+import static com.gnatali.streaming.pacman.utils.Constants.HEADERS_KEY;
+import static com.gnatali.streaming.pacman.utils.Constants.ORIGIN_KEY;
+import static com.gnatali.streaming.pacman.utils.Constants.POST_METHOD;
+import static com.gnatali.streaming.pacman.utils.Constants.ORIGIN_ALLOWED_SSM_PARAM;
+
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
@@ -14,17 +22,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
+import software.amazon.awssdk.services.ssm.SsmClient;
+import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
+import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
+import software.amazon.awssdk.services.ssm.model.SsmException;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.gnatali.streaming.pacman.utils.Constants.*;
 
 public class EventHandler implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
@@ -37,22 +44,21 @@ public class EventHandler implements RequestHandler<Map<String, Object>, Map<Str
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     OkHttpClient client = new OkHttpClient.Builder()
-    .addInterceptor(new BasicAuthInterceptor(username, password))
-    .build();
-  
+            .addInterceptor(new BasicAuthInterceptor(username, password))
+            .build();
 
     private String post(String url, String json, String accept) throws IOException {
         RequestBody body = RequestBody.create(json, MEDIATYPE_KSQL);
         okhttp3.Request.Builder requestBuilder = new Request.Builder()
-            .url(url);
+                .url(url);
 
-            if(accept != null){
-                requestBuilder.addHeader("Accept", accept);
-            }
+        if (accept != null) {
+            requestBuilder.addHeader("Accept", accept);
+        }
 
-            Request request = requestBuilder
-            .post(body)
-            .build();
+        Request request = requestBuilder
+                .post(body)
+                .build();
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
         }
@@ -66,26 +72,32 @@ public class EventHandler implements RequestHandler<Map<String, Object>, Map<Str
         logger.log("CONTEXT: " + gson.toJson(context));
 
         String result;
-        
+
         Map<String, Object> response = new HashMap<>();
         if (!request.containsKey(HEADERS_KEY)) {
-            result = "Thanks for waking me up" ;
+            result = "Thanks for waking me up";
             response.put(BODY_KEY, result);
             logger.log("Function wake up received");
             return response;
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> requestHeaders =
-            (Map<String, Object>) request.get(HEADERS_KEY);
+        Map<String, Object> requestHeaders = (Map<String, Object>) request.get(HEADERS_KEY);
 
         if (requestHeaders.containsKey(ORIGIN_KEY)) {
 
-            String origin = (String) requestHeaders.get(ORIGIN_KEY);
-            logger.log("Function origin is "+origin);
-            logger.log("Origin Allowed is "+ORIGIN_ALLOWED);
+            SsmClient ssmClient = SsmClient.create();
 
-            if (origin.equals(ORIGIN_ALLOWED)) {
+            logger.log("Retrieving SSM parameter: " + ORIGIN_ALLOWED_SSM_PARAM);
+            String originAllowedFromSSM = getParaValue(ssmClient,  ORIGIN_ALLOWED_SSM_PARAM );
+            ssmClient.close();
+            logger.log("Retrieved SSM parameter value is: " + originAllowedFromSSM);
+
+            String origin = (String) requestHeaders.get(ORIGIN_KEY);
+            logger.log("Function origin is " + origin);
+            logger.log("Origin Allowed is " + originAllowedFromSSM);
+
+            if (origin.equals(originAllowedFromSSM)) {
 
                 if (request.containsKey(BODY_KEY)) {
 
@@ -94,31 +106,30 @@ public class EventHandler implements RequestHandler<Map<String, Object>, Map<Str
                     logger.log("EVENT: " + gson.toJson(event));
                     logger.log("EVENT TYPE: " + event.getClass().toString());
 
-                    if (event != null ) {
+                    if (event != null) {
 
                         JsonElement payloadRoot = JsonParser.parseString(event);
-                        
+
                         String payloadEndpoint = payloadRoot.getAsJsonObject().get("endpoint").getAsString();
                         String payloadQuery;
-                       
-                        logger.log("payloadEndpoint: "+payloadEndpoint);
+
+                        logger.log("payloadEndpoint: " + payloadEndpoint);
 
                         String endpoint;
                         String queryObjName;
                         String accept = null;
-                        
-                        
-                        if(Constants.KSQLDB_ENDPOINT_QUERY.equals(payloadEndpoint)){
+
+                        if (Constants.KSQLDB_ENDPOINT_QUERY.equals(payloadEndpoint)) {
                             endpoint = Constants.KSQLDB_ENDPOINT_QUERY;
                             queryObjName = "sql";
                             accept = "application/json";
-                        }else if(Constants.KSQLDB_ENDPOINT_KSQL.equals(payloadEndpoint)){
+                        } else if (Constants.KSQLDB_ENDPOINT_KSQL.equals(payloadEndpoint)) {
                             endpoint = Constants.KSQLDB_ENDPOINT_KSQL;
                             queryObjName = "ksql";
-                            
+
                         } else {
                             StringBuilder message = new StringBuilder();
-                            message.append("The endpoint provided ("+payloadEndpoint+") is not supported");
+                            message.append("The endpoint provided (" + payloadEndpoint + ") is not supported");
                             result = message.toString();
                             response.put(BODY_KEY, result);
 
@@ -126,19 +137,18 @@ public class EventHandler implements RequestHandler<Map<String, Object>, Map<Str
                         }
 
                         payloadQuery = payloadRoot.getAsJsonObject().get(queryObjName).getAsString();
-                        logger.log("payloadQuery: "+payloadQuery);
+                        logger.log("payloadQuery: " + payloadQuery);
 
                         JsonObject newPayload = new JsonObject();
                         newPayload.add(queryObjName, payloadRoot.getAsJsonObject().get(queryObjName));
-                        
 
                         try {
-                            logger.log("Sending POST to : "+Constants.KSQLDB_ENDPOINT + "/" + endpoint);
-                            logger.log("Payload : "+ gson.toJson(newPayload));
+                            logger.log("Sending POST to : " + Constants.KSQLDB_ENDPOINT + "/" + endpoint);
+                            logger.log("Payload : " + gson.toJson(newPayload));
                             result = post(Constants.KSQLDB_ENDPOINT + "/" + endpoint, gson.toJson(newPayload), accept);
-                            logger.log("Post worked: "+endpoint+" result: "+result);
+                            logger.log("Post worked: " + endpoint + " result: " + result);
                         } catch (Exception e) {
-                            logger.log("Error! "+e.getMessage());
+                            logger.log("Error! " + e.getMessage());
                             logger.log(ExceptionUtils.getStackTrace(e));
                             StringBuilder message = new StringBuilder();
                             message.append("Error in executing the query ");
@@ -150,33 +160,47 @@ public class EventHandler implements RequestHandler<Map<String, Object>, Map<Str
                         }
 
                         response.put(BODY_KEY, result);
-                        
+
                         Map<String, Object> responseHeaders = new HashMap<>();
                         responseHeaders.put("Access-Control-Allow-Headers", "*");
                         responseHeaders.put("Access-Control-Allow-Methods", POST_METHOD);
-                        responseHeaders.put("Access-Control-Allow-Origin", ORIGIN_ALLOWED);
+                        responseHeaders.put("Access-Control-Allow-Origin", originAllowedFromSSM);
                         response.put(HEADERS_KEY, responseHeaders);
 
-                    }else{
+                    } else {
                         logger.log("Didn't enter first IF!");
                     }
-        
+
                 }
-                
+
             }
-            
-        }else {
+
+        } else {
             logger.log("No origin!");
         }
-        
-        logger.log("Response will be sent : "+ gson.toJson(response));
+
+        logger.log("Response will be sent : " + gson.toJson(response));
         return response;
-    
+
     }
 
+    public static String getParaValue(SsmClient ssmClient, String paraName) {
 
-    
+        String res = "";
+        try {
+            GetParameterRequest parameterRequest = GetParameterRequest.builder()
+                    .name(paraName)
+                    .build();
 
-    
+            GetParameterResponse parameterResponse = ssmClient.getParameter(parameterRequest);
+            System.out.println("The parameter value is " + parameterResponse.parameter().value());
+            res = parameterResponse.parameter().value();
+
+        } catch (SsmException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+        return res;
+    }
 
 }

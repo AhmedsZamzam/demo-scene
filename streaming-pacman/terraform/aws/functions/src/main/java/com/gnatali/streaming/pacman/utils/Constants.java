@@ -2,7 +2,8 @@ package com.gnatali.streaming.pacman.utils;
 
 public interface Constants {
 
-    public static final String ORIGIN_ALLOWED = System.getenv("ORIGIN_ALLOWED");
+    //public static final String ORIGIN_ALLOWED = System.getenv("ORIGIN_ALLOWED");
+    public static final String ORIGIN_ALLOWED_SSM_PARAM = System.getenv("ORIGIN_ALLOWED_SSM_PARAM");
     public static final String KSQLDB_API_AUTH_INFO = System.getenv("KSQLDB_API_AUTH_INFO");
     public static final String KSQLDB_ENDPOINT = System.getenv("KSQLDB_ENDPOINT");
 

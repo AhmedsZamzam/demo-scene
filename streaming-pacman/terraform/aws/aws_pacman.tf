@@ -85,7 +85,7 @@ locals {
   # Env vars file from template
   env_vars_js = templatefile("${path.module}/../../pacman/game/template/env-vars.js", {
         cloud_provider = "AWS"
-        ksqldb_endpoint = "${aws_api_gateway_deployment.event_handler_v1.invoke_url}${aws_api_gateway_resource.event_handler_resource.path}"
+        ksqldb_endpoint = "${aws_api_gateway_stage.event_handler_v1.stage_name}${aws_api_gateway_resource.event_handler_resource.path}"
         #ksql_basic_auth_user_info = local.ksql_basic_auth_user_info
         #TODO scoreboard_api = "${aws_api_gateway_deployment.scoreboard_v1.invoke_url}${aws_api_gateway_resource.scoreboard_resource.path}"
         #scoreboard_api = ""

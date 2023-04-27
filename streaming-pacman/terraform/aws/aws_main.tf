@@ -4,6 +4,9 @@
 locals {
   resource_prefix = "${var.global_prefix}${random_string.random_string2.result}"
   bucket_pacman = "%{ if var.s3_bucket_name != "" }${var.s3_bucket_name}%{ else }${var.global_prefix}${random_string.random_string.result}%{ endif }"
+  s3_origin_id     = "S3-${aws_s3_bucket.pacman.bucket}"
+  api_gw_origin_id = "API-GW-${aws_api_gateway_rest_api.event_handler_api.id}"
+  ssm_parameter_name = "${local.resource_prefix}-ssm-origin"
 }
 
 provider "aws" {
@@ -67,6 +70,47 @@ resource "aws_s3_bucket_policy" "allow_access_from_public" {
   policy = data.aws_iam_policy_document.allow_access_from_public.json
 }
 
+/*
+resource "aws_s3_bucket" "blog" {
+  bucket = "blog.example.org"
+  acl    = "private"
+}
+
+resource "aws_s3_bucket" "logs" {
+  bucket = "logs.blog.example.org"
+  acl    = "private"
+}
+
+data "aws_iam_policy_document" "blog_s3_policy" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.blog.arn}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn}"]
+    }
+  }
+
+  statement {
+    actions   = ["s3:ListBucket"]
+    resources = ["${aws_s3_bucket.blog.arn}"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn}"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "blog" {
+  bucket = "${aws_s3_bucket.blog.id}"
+  policy = "${data.aws_iam_policy_document.blog_s3_policy.json}"
+}
+
+
+
+*/
 data "aws_iam_policy_document" "allow_access_from_public" {
   statement {
     sid = "PublicReadGetObject"

@@ -42,5 +42,13 @@ output "confluent_ksql_cluster_api_secret" {
 ###########################################
 
 output "Pacman" {
-  value = "http://${aws_s3_bucket_website_configuration.pacman.website_endpoint}"
+  value = "http://${aws_s3_bucket_website_configuration.pacman.website_endpoint} or ${aws_cloudfront_distribution.pacman.domain_name} and stuff 1 ${aws_api_gateway_rest_api.event_handler_api.id}.execute-api.${var.aws_region}.amazonaws.com  and stuff2 /${aws_api_gateway_stage.event_handler_v1.stage_name}${aws_api_gateway_resource.event_handler_resource.path}"
+}
+
+output cf_domain_name {
+  value = aws_cloudfront_distribution.pacman.domain_name
+}
+
+output cf_hosted_zone_id {
+  value = aws_cloudfront_distribution.pacman.hosted_zone_id
 }
