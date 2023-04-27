@@ -46,45 +46,17 @@ resource "aws_s3_bucket_ownership_controls" "pacman" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "pacman" {
-  bucket = aws_s3_bucket.pacman.id
-
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
-
-resource "aws_s3_bucket_acl" "pacman" {
-  depends_on = [
-    aws_s3_bucket_ownership_controls.pacman,
-    aws_s3_bucket_public_access_block.pacman,
-  ]
+resource "aws_s3_bucket_acl" "example" {
+  depends_on = [aws_s3_bucket_ownership_controls.pacman]
 
   bucket = aws_s3_bucket.pacman.id
-  acl    = "public-read"
-}
-
-resource "aws_s3_bucket_policy" "allow_access_from_public" {
-  bucket = aws_s3_bucket.pacman.id
-  policy = data.aws_iam_policy_document.allow_access_from_public.json
-}
-
-/*
-resource "aws_s3_bucket" "blog" {
-  bucket = "blog.example.org"
   acl    = "private"
 }
 
-resource "aws_s3_bucket" "logs" {
-  bucket = "logs.blog.example.org"
-  acl    = "private"
-}
-
-data "aws_iam_policy_document" "blog_s3_policy" {
+data "aws_iam_policy_document" "pacman_s3_policy" {
   statement {
     actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.blog.arn}/*"]
+    resources = ["${aws_s3_bucket.pacman.arn}/*"]
 
     principals {
       type        = "AWS"
@@ -94,7 +66,7 @@ data "aws_iam_policy_document" "blog_s3_policy" {
 
   statement {
     actions   = ["s3:ListBucket"]
-    resources = ["${aws_s3_bucket.blog.arn}"]
+    resources = ["${aws_s3_bucket.pacman.arn}"]
 
     principals {
       type        = "AWS"
@@ -103,14 +75,12 @@ data "aws_iam_policy_document" "blog_s3_policy" {
   }
 }
 
-resource "aws_s3_bucket_policy" "blog" {
-  bucket = "${aws_s3_bucket.blog.id}"
-  policy = "${data.aws_iam_policy_document.blog_s3_policy.json}"
+resource "aws_s3_bucket_policy" "pacman" {
+  bucket = "${aws_s3_bucket.pacman.id}"
+  policy = "${data.aws_iam_policy_document.pacman_s3_policy.json}"
 }
 
-
-
-*/
+/*
 data "aws_iam_policy_document" "allow_access_from_public" {
   statement {
     sid = "PublicReadGetObject"
@@ -129,6 +99,7 @@ data "aws_iam_policy_document" "allow_access_from_public" {
     ]
   }
 }
+
 
 resource "aws_s3_bucket_website_configuration" "pacman" {
   bucket = aws_s3_bucket.pacman.id
@@ -151,5 +122,6 @@ resource "aws_s3_bucket_cors_configuration" "pacman" {
     allowed_origins = ["*"]
   }
 }
+*/
 
 

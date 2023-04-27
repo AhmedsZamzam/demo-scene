@@ -127,6 +127,7 @@ resource "aws_api_gateway_method_settings" "event_handler_method_settings" {
   }
 }
 
+/*
 resource "aws_api_gateway_integration_response" "event_handler_options_integration_response" {
   depends_on = [aws_s3_bucket.pacman]
   rest_api_id = aws_api_gateway_rest_api.event_handler_api.id
@@ -138,7 +139,7 @@ resource "aws_api_gateway_integration_response" "event_handler_options_integrati
     "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
     "method.response.header.Access-Control-Allow-Origin" = "'http://${aws_s3_bucket_website_configuration.pacman.website_endpoint}'"
   }
-}
+}*/
 
 ###########################################
 ######### Event Handler Function ##########
