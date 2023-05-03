@@ -2,7 +2,7 @@
 ############ Common Artifacts #############
 ###########################################
 
-resource "null_resource" "build_functions" {
+/*resource "null_resource" "build_functions" {
   #if you enable this will conflict with the hash checking on the lambda function
   # triggers = {
   #   always_run = "${timestamp()}"
@@ -12,7 +12,7 @@ resource "null_resource" "build_functions" {
     interpreter = ["bash", "-c"]
     working_dir = "functions"
   }
-}
+}*/
 
 locals {
   generic_wake_up = templatefile("functions/generic-wake-up.json", {
@@ -254,7 +254,7 @@ resource "aws_ssm_parameter" "origin_allowed" {
 
 resource "aws_lambda_function" "event_handler_function" {
   depends_on = [
-    null_resource.build_functions,
+    //null_resource.build_functions,
     aws_iam_role.event_handler_role,
     aws_s3_bucket.pacman]
   function_name = "${local.resource_prefix}_event_handler"
