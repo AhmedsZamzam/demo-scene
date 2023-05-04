@@ -157,7 +157,7 @@ image::emptyscoreboard.png[]
 
 
 
-But first lets make sure the data is flowing into the Confluent. 
+But first let's make sure the data is flowing into the Confluent. 
 
 1. In Confluent UI go to the cluster created by the terraform script - should end with ``` -pacman-workshop ```
 
@@ -166,14 +166,13 @@ But first lets make sure the data is flowing into the Confluent.
 image::topicui.png[]
 
 
-
-== Step 7. Looking under the hood
-
 When users play with the Pac-Man game two types of events will be generated. One is called *User Game* and contains the data about the user's current game such as their score, current level, and the number of lives. The other is called *User Losses* and as the name implies contains data about whether the user lose in the game. To build a scoreboard out of this a streaming analytics pipeline will be created to transform these raw events into a table with the scoreboard that is updated in near real-time.
 
 image::pipeline.png[]
 
-== Step 8. Run the ksqlDB queries
+Now that the data is flowing into Confluent, we can create the ksqlDB queries that populate the scoreboard.
+
+== Step 9. Run the ksqlDB queries
 
 To implement the pipeline we use ksqlDB. Run the following queries in your ksqlDB instance in Confluent Cloud
 
@@ -270,7 +269,7 @@ select USER, HIGHEST_SCORE, HIGHEST_LEVEL, TOTAL_LOSSES from STATS_PER_USER WHER
 ----
 
 
-== Step 9. Destroy the resources (save money!)
+== Step 10. Destroy the resources (save money!)
 
 The great thing about Cloud resources is that you can spin the up and down with few commands. Once you are finished with this worksho/demo , remember to destroy the resources you created today, to avoid incuring in charges if you are not planning to use this. You can always spin it up again anytime you want (uncomment the run_as_workshop variable in the config file if you want to automate the creation of ksqlDB queries, so you can demo the app without any manual effort)! 
 
