@@ -42,7 +42,7 @@ output "confluent_ksql_cluster_api_secret" {
 ###########################################
 
 output "Pacman" {
-  value = "${aws_cloudfront_distribution.pacman.domain_name}"
+  value = "https://${aws_cloudfront_distribution.pacman.domain_name}"
 }
 
 output cf_domain_name {

@@ -101,6 +101,11 @@ function start_demo {
 
     ccloud::prompt_continue_ccloud_demo || exit 1 
 
+    # Build Lambda Function with Maven
+    cd $TFS_PATH/functions
+    sh build.sh
+    cd $PRJ_DIR
+
     create_infra_with_tf
 
     init_vars_from_tf_output
