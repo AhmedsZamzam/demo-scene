@@ -152,9 +152,9 @@ The scoreboard can be visualized in real time by clicking on the *SCOREBOARD* li
 
 image::emptyscoreboard.png[]
 
-But if you look at the Kafka Topic in Confluent UI, you should see the data flllowing into the Confluent
+But if you look at the Kafka Topic in Confluent UI, you should see the data flowing into the Confluent
 
-image::scoreboard.png[]
+image::topicui.png[]
 
 == Step 7. Looking under the hood
 
