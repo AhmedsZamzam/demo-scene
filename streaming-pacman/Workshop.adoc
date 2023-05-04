@@ -165,8 +165,11 @@ But first let's make sure the data is flowing into the Confluent.
 
 image::topicui.png[]
 
+As users engage with the Pac-Man game, two types of events will be generated. The first is referred to as the "User Game" event and includes information about the user's current game state, such as their score, level, and remaining lives. This event will be triggered every time the user's score changes, advances to a new level, or loses a life.
 
-When users play with the Pac-Man game two types of events will be generated. One is called *User Game* and contains the data about the user's current game such as their score, current level, and the number of lives. The other is called *User Losses* and as the name implies contains data about whether the user lose in the game. To build a scoreboard out of this a streaming analytics pipeline will be created to transform these raw events into a table with the scoreboard that is updated in near real-time.
+The second type of event is called the "User Losses" event, which as the name suggests, captures data related to the user's loss in the game. This event is triggered when the player reaches the game-over state.
+
+To build a scoreboard out of this, a streaming analytics pipeline will be created to transform these raw events into a table with the scoreboard that is updated in near real-time.
 
 image::pipeline.png[]
 
@@ -244,7 +247,6 @@ FROM
 GROUP BY 
   'SUMMARY_KEY';
 ----
-
 
 4. Now look at the scoreboard, it should be populated
 
