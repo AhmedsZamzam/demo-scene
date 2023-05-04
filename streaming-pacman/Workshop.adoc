@@ -17,9 +17,50 @@ To implement streaming analytics in the game we built a  link:statements.sql[sco
 * *Terraform (0.14+)* - The application is automatically created using https://www.terraform.io[Terraform]. Besides having Terraform installed locally, will need to provide your cloud provider credentials so Terraform can create and manage the resources for you.
 * *AWS account* - This demo/Workshop runs on AWS
 
-== Step 1. Clone this repo
+
+== PRE-WORK: Step 1. Install workshop dependencies
+
+Run the following command to install workshop dependencies
+[source,bash]
+----
+brew install terraform \
+mvn \
+jq \
+awscli \
+confluent-cli
+----
+
+
+== PRE-WORK: Step 2. Signup for Confluent Cloud
+
+You can Create a Confluent Cloud Account following this link: https://www.confluent.io/confluent-cloud/tryfree/?utm_campaign=tm.campaigns_cd.Q223_EMEA_AWS-Pacman-Workshop&utm_source=marketo&utm_medium=workshop[Try Confluent Cloud For Free (Pacman Workshop)]
+
+If you want to create a Confluent Cloud account from the *AWS Marketplace*, follow this link:
+https://www.confluent.io/partner/amazon-web-services/?utm_campaign=tm.campaigns_cd.mp-workshop-pacman-emea-awsmarketplace&utm_medium=marketingemail[Try Confluent Cloud For Free - Sign up from AWS Marketplace (Pacman Workshop)]
+
+=== PRE-WORK: Step 2a. Create a Cloud API Key
+
+1. Open the https://confluent.cloud/settings/api-keys/create[Confluent Cloud Console] and click **Granular access** tab, and then click **Next**.
+2. Click **Create a new one to create** tab. Enter the new service account name (`tf_runner`), then click **Next**.
+3. The Cloud API key and secret are generated for the `tf_runner` service account. Save your Cloud API key and secret in a secure location. You will need this API key and secret **to use the Confluent Terraform Provider**.
+4. https://confluent.cloud/settings/org/assignments[Assign] the `OrganizationAdmin` role to the `tf_runner` service account by following https://docs.confluent.io/cloud/current/access-management/access-control/cloud-rbac.html#add-a-role-binding-for-a-user-or-service-account[this guide].
+
+image::https://github.com/confluentinc/terraform-provider-confluent/raw/master/docs/images/OrganizationAdmin.png[Assigning the OrganizationAdmin role to tf_runner service account]
+
+=== PRE-WORK: Step 2b. Configure the Confluent CLI
+
+1. Log in to the Confluent Cloud CLI:
+
+[source,bash]
+----
+confluent login --save
+----
+
+The --save flag will save your Confluent Cloud login credentials to the ~/.netrc file.
+
+== Step 3. Clone this repo
 First things first, clone this github repo to your local machine (Use your Terminal):
-+
+
 [source,bash]
 ----
 git clone --branch streaming-pacman-workshop -n --depth=1 --filter=tree:0 https://github.com/gianlucanatali/demo-scene.git
@@ -30,55 +71,24 @@ cd streaming-pacman
 ----
 
 
-== Step 2. Signup for Confluent Cloud
 
-You can Create a Confluent Cloud Account following this link: https://www.confluent.io/confluent-cloud/tryfree/?utm_campaign=tm.campaigns_cd.Q223_EMEA_AWS-Pacman-Workshop&utm_source=marketo&utm_medium=workshop[Try Confluent Cloud For Free (Pacman Workshop)]
+== Step 4. Configure the deployment
 
-If you want to create a Confluent Cloud account from the *AWS Marketplace*, follow this link:
-https://www.confluent.io/partner/amazon-web-services/?utm_campaign=tm.campaigns_cd.mp-workshop-pacman-emea-awsmarketplace&utm_medium=marketingemail[Try Confluent Cloud For Free - Sign up from AWS Marketplace (Pacman Workshop)]
+The whole workshop creation is scripted. The script will leverage Terraform to:
+* As mentioned before the application uses a Kafka cluster running in a fully managed service for Apache Kafka. Therefore the first thing it will provision is Confluent Cloud resources using the Confluent Cloud CLI. If you are interested in how you can create a cluster in Confluent Cloud via the Web UI have a look at our https://docs.confluent.io/current/quickstart/cloud-quickstart/index.html[Quick Start for Apache Kafka using Confluent Cloud].
+* Spin up the other resources needed in AWS
 
-=== Step 2b. Create a Cloud API Key
-
-1. Open the https://confluent.cloud/settings/api-keys/create[Confluent Cloud Console] and click **Granular access** tab, and then click **Next**.
-2. Click **Create a new one to create** tab. Enter the new service account name (`tf_runner`), then click **Next**.
-3. The Cloud API key and secret are generated for the `tf_runner` service account. Save your Cloud API key and secret in a secure location. You will need this API key and secret **to use the Confluent Terraform Provider**.
-4. https://confluent.cloud/settings/org/assignments[Assign] the `OrganizationAdmin` role to the `tf_runner` service account by following https://docs.confluent.io/cloud/current/access-management/access-control/cloud-rbac.html#add-a-role-binding-for-a-user-or-service-account[this guide].
-
-
-
-image::https://github.com/confluentinc/terraform-provider-confluent/raw/master/docs/images/OrganizationAdmin.png[Assigning the OrganizationAdmin role to tf_runner service account]
-
-
-== Step 3. Configure the demo
-
-The whole demo creation is scripted. The script will leverage Terraform to:
-1. As mentioned before the application uses a Kafka cluster running in a fully managed service for Apache Kafka. Therefore the first thing it will provision is Confluent Cloud resources using the Confluent Cloud CLI. If you are interested in how you can create a cluster in Confluent Cloud via the Web UI have a look at our https://docs.confluent.io/current/quickstart/cloud-quickstart/index.html[Quick Start for Apache Kafka using Confluent Cloud].
-2. Spin up the other resources needed in AWS
-
-=== Step 3a. Configure the Confluent CLI
-
-1. Log in to the Confluent Cloud CLI:
-+
-[source,bash]
-----
-confluent login --save
-----
-
-The --save flag will save your Confluent Cloud login credentials to the ~/.netrc file.
-
-=== Step 3b. Configure the demo
-The demo script will do everything for you, but for it to work you need to add some configurations.
-
+Run the following steps to configure the workshop
 
 1. Create the demo.cfg file using the example provided in the config folder
-+
+
 [source,bash]
 ----
 cp config/demo.cfg.example config/demo.cfg
 ----
 
 2. Provide the required information on the 'demo.cfg' file
-+
+
 [source,bash]
 ----
 export TF_VAR_aws_profile="<AWS_PROFILE>"
@@ -87,13 +97,13 @@ export TF_VAR_schema_registry_region="eu-central-1"
 export TF_VAR_confluent_cloud_api_key=="<CONFLUENT_CLOUD_API_KEY>"
 export TF_VAR_confluent_cloud_api_secret="<CONFLUENT_CLOUD_API_SECRET>"
 ----
-+
+
 we advice using the utility https://github.com/Nike-Inc/gimme-aws-creds[gimme-aws-creds] if you use Okta to login in AWS. You can also use the [granted](https://granted.dev/) CLI for AWS creds. 
 Amend any of the config as you see fit for your preference (Like the aws region or Schema registry Region)
 
 3. If you are not using gimme-aws-creds, create a credential file as described https://registry.terraform.io/providers/hashicorp/aws/latest/docs#shared-configuration-and-credentials-files[here]. 
 The file in ``~/.aws/credentials`` should look like this (An example below)
-+
+
 [source,bash]
 ----
 [default]
@@ -103,7 +113,7 @@ aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 You can set ``TF_VAR_aws_profile="default"`` in the ``demo.cfg`` file
 
 4. Notice the optional configuration in the same file. Uncomment and define as you see fit
-+
+
 [source,bash]
 ----
 # These are optional configs
@@ -111,7 +121,7 @@ You can set ``TF_VAR_aws_profile="default"`` in the ``demo.cfg`` file
 ----
 
 
-== Step 4. Deploying the application
+== Step 5. Deploying the application
 
 The application is essentially a set of link:pacman/[HTML/CSS/JS files] that forms a microsite that can be hosted statically anywhere. But for the sake of coolness we will deploy this microsite in a S3 bucket from AWS. This bucket will be created in the same region selected for the Confluent Cloud cluster to ensure that the application will be co-located. The application will emit events that will be processed by a event handler implemented as an API Gateway which uses a Lambda function as backend. This event handler API receives the events and writes them into Kafka using ksqlDB.
 
@@ -120,39 +130,43 @@ image::pac-man-arch.png[align="left"]
 Please note that during deployment, the script takes care of creating the required Kafka topics and also the ksqlDB queries. Therefore, there is no need to manually create them.
 
 1. Start the demo creation
-+
+
 [source,bash]
 ----
 ./start.sh
 ----
 
 2. At the end of the provisioning the Output with the demo endpoint will be shown. Paste the demo url in your browser and start playing!
-+
+
 [source,bash]
 ----
 Outputs:
 
-Pacman = http://streaming-pacman00000.s3-website-region.amazonaws.com
+Pacman = https://d************.cloudfront.net/
 ----
 
 If you notice a CORS error in the browser and the scoreboard is not updating, try relaunching. 
 
-== Step 5. The scoreboard
+== Step 6. The scoreboard
 The scoreboard can be visualized in real time by clicking on the *SCOREBOARD* link in the pacman game (top right corner). Who will be the best player? At the beginning you will not be able to use this feature if you are running this as a workshop, as you first need to create the ksqlDB queries.
 
 image::scoreboard.png[]
 
-== Step 6. Looking under the hood
+But if you look at the Kafka Topic in Confluent UI, you should see the data flllowing into the Confluent
+
+image::scoreboard.png[]
+
+== Step 7. Looking under the hood
 
 When users play with the Pac-Man game two types of events will be generated. One is called *User Game* and contains the data about the user's current game such as their score, current level, and the number of lives. The other is called *User Losses* and as the name implies contains data about whether the user lose in the game. To build a scoreboard out of this a streaming analytics pipeline will be created to transform these raw events into a table with the scoreboard that is updated in near real-time.
 
 image::pipeline.png[]
 
-== Step 7. Run the ksqlDB queries
+== Step 8. Run the ksqlDB queries
 
 To implement the pipeline we use ksqlDB. Run the following queries in your ksqlDB instance in Confluent Cloud
 
-1. 
+*TO BE REMOVED and added to provision stage*
 Create
 [source,sql]
 ----
@@ -164,7 +178,7 @@ CREATE STREAM USER_GAME (
 );
 ----
 
-2. 
+*TO BE REMOVED and added to provision stage*
 
 [source,sql]
 ----
@@ -173,7 +187,7 @@ CREATE STREAM USER_LOSSES (USER VARCHAR) WITH (
 );
 ----
 
-3. 
+1. Create a table to count the number of losses for each player.
 
 [source,sql]
 ----
@@ -187,7 +201,7 @@ GROUP BY
   USER;
 ----
 
-4. 
+2. 
 
 [source,sql]
 ----
@@ -206,7 +220,7 @@ GROUP BY
   UG.USER;
 ----
 
-5. 
+3. 
 
 [source,sql]
 ----
@@ -220,6 +234,11 @@ FROM
 GROUP BY 
   'SUMMARY_KEY';
 ----
+
+
+4. Now look at the scoreboard, it should be populated
+
+image::scoreboard.png[]
 
 === the Scoreboard logic
 ksqlDB supports link:https://docs.ksqldb.io/en/0.14.0-ksqldb/concepts/queries/pull/[Pull queries], where you can get the latest value for a given key. The pacman app uses this feature in order to show you the scoreboard, with a simple trick:
@@ -239,9 +258,8 @@ SELECT HIGHEST_SCORE_VALUE, USERS_SET_VALUE FROM SUMMARY_STATS WHERE SUMMARY_KEY
 select USER, HIGHEST_SCORE, HIGHEST_LEVEL, TOTAL_LOSSES from STATS_PER_USER WHERE USER IN (${userListCsv});
 ----
 
-== Step 8. Have a look around the demo, test it
 
-== Step 9. Detroy the resources (save money!)
+== Step 9. Destroy the resources (save money!)
 
 The great thing about Cloud resources is that you can spin the up and down with few commands. Once you are finished with this worksho/demo , remember to destroy the resources you created today, to avoid incuring in charges if you are not planning to use this. You can always spin it up again anytime you want (uncomment the run_as_workshop variable in the config file if you want to automate the creation of ksqlDB queries, so you can demo the app without any manual effort)! 
 
