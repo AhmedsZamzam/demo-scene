@@ -44,7 +44,7 @@ resource "confluent_schema_registry_cluster" "essentials" {
 # Update the config to use a cloud provider and region of your choice.
 # https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/confluent_kafka_cluster
 resource "confluent_kafka_cluster" "pacman-demo" {
-  display_name = "inventory"
+  display_name = "${local.resource_prefix}-pacman-workshop"
   availability = "SINGLE_ZONE"
   cloud        = "AWS"
   region       = var.aws_region
@@ -54,10 +54,11 @@ resource "confluent_kafka_cluster" "pacman-demo" {
   }
 }
 
+
 // 'app-manager' service account is required in this configuration to grant ACLs
 // to 'app-ksql' service account and create 'USER_GAME' and 'USER_LOSSES' topics
 resource "confluent_service_account" "app-manager" {
-  display_name = "app-manager"
+  display_name = "${local.resource_prefix}-app-manager"
   description  = "Service account to manage 'inventory' Kafka cluster"
 }
 
@@ -124,7 +125,7 @@ resource "confluent_kafka_topic" "user_losses" {
 
 // ksqlDB service account with only the necessary access
 resource "confluent_service_account" "app-ksql" {
-  display_name = "app-ksql"
+  display_name = "${local.resource_prefix}-app-ksql"
   description  = "Service account for Ksql cluster"
 }
 
