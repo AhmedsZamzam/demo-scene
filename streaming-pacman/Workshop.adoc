@@ -148,13 +148,24 @@ Pacman = https://d************.cloudfront.net/
 If you notice a CORS error in the browser and the scoreboard is not updating, try relaunching. 
 
 == Step 6. The scoreboard
-The scoreboard can be visualized in real time by clicking on the *SCOREBOARD* link in the pacman game (top right corner). Who will be the best player? At the beginning you will not be able to use this feature if you are running this as a workshop, as you first need to create the ksqlDB queries.
+The scoreboard can be visualized in real time by clicking on the *SCOREBOARD* link in the pacman game (top right corner). 
+
+> **Note**
+> At the beginning you will not be able to use this feature, as you first need to create the ksqlDB queries that populate the scoreboard
 
 image::emptyscoreboard.png[]
 
-But if you look at the Kafka Topic in Confluent UI, you should see the data flowing into the Confluent
+
+
+But first lets make sure the data is flowing into the Confluent. 
+
+1. In Confluent UI go to the cluster created by the terraform script - should end with ``` -pacman-workshop ```
+
+2. Click on *Topics* and choose ```USER_GAME``` topic 
 
 image::topicui.png[]
+
+
 
 == Step 7. Looking under the hood
 
