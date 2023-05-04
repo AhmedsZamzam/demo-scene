@@ -137,8 +137,6 @@ Pacman = http://streaming-pacman00000.s3-website-region.amazonaws.com
 
 If you notice a CORS error in the browser and the scoreboard is not updating, try relaunching. 
 
-----
-
 == Step 5. The scoreboard
 The scoreboard can be visualized in real time by clicking on the *SCOREBOARD* link in the pacman game (top right corner). Who will be the best player? At the beginning you will not be able to use this feature if you are running this as a workshop, as you first need to create the ksqlDB queries.
 
