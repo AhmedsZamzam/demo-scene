@@ -51,3 +51,20 @@ function json2table(json, classes, headers) {
 		   '</tbody></table>';
 
 }
+
+function setUpScoreboardDeamonLoader(storageManager, delay, fillPage) {
+
+	var scoreboardInterval = storageManager.getScoreboardInterval();
+	clearInterval(scoreboardInterval);
+	scoreboardInterval = window.setInterval(function(){
+		loadScoreboard(storageManager);
+		if(fillPage){
+			fillScoreboardPage(storageManager);
+		}
+	}, delay);
+
+	storageManager.setScoreboardInterval(scoreboardInterval);
+
+
+}
+

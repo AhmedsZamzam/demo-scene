@@ -1,12 +1,11 @@
-var localSore = new LocalStorageManager;
+var localStoreManager = new LocalStorageManager;
+
 
 window.requestAnimationFrame(function () {
-    fillScoreboardPage(localSore);
-    loadScoreboard(localSore);
+    localStoreManager.setGameName("2048");
+    fillScoreboardPage(localStoreManager);
+    loadScoreboard(localStoreManager);
 
-    window.setInterval(function(){
-        /// call your function here
-        loadScoreboard(localSore);
-        fillScoreboardPage(localSore);
-    }, 1000);
+    setUpScoreboardDeamonLoader(localStoreManager, 2000, true)
+
 });

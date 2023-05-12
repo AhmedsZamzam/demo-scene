@@ -70,6 +70,7 @@ function loadSummaryStats(gameName,callback) {
 
 
 function getScoreboardJson(gameName,userList,callback) {
+	if(!userList){return;}
 
 	var userListCsv = userList.map(user_key => `STRUCT(USER:='${user_key.USER}',GAME_NAME:='${user_key.GAME_NAME}')`).join(',');
 

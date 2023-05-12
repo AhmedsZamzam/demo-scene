@@ -59,9 +59,7 @@ GameManager.prototype.setup = function () {
 
   loadScoreboard(storageManager);
 
-  window.setInterval(function(){
-      loadScoreboard(storageManager);
-  }, 1000);
+  setUpScoreboardDeamonLoader(storageManager, 2000);
 
   // Reload the game from a previous game if present, only if it is the same user
   if (previousState && previousState.username===this.username ) {

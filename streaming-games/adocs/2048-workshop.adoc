@@ -143,7 +143,7 @@ You can set ``TF_VAR_aws_profile="default"`` in the ``demo.cfg`` file
 
 The application is essentially a set of link:games/2048/[HTML/CSS/JS files] that forms a microsite that can be hosted statically anywhere. But for the sake of coolness we will deploy this microsite in a S3 bucket from AWS. This bucket will be created in the same region selected for the Confluent Cloud cluster to ensure that the application will be co-located. The application will emit events that will be processed by a event handler implemented as an API Gateway which uses a Lambda function as backend. This event handler API receives the events and writes them into Kafka using ksqlDB.
 
-image::pac-man-arch.png[align="left"]
+image::arch.png[align="left"]
 
 Please note that during deployment, the script takes care of creating the required Kafka topics and also the ksqlDB queries. Therefore, there is no need to manually create them.
 
@@ -183,7 +183,7 @@ But first let's make sure the data is flowing into the Confluent.
 
 image::topicui.png[]
 
-As users engage with the Pac-Man game, two types of events will be generated. The first is referred to as the "User Game" event and includes information about the user's current game state, such as their score, level, and remaining lives. This event will be triggered every time the user's score changes, advances to a new level, or loses a life.
+As users engage with the 2048 game, two types of events will be generated. The first is referred to as the "User Game" event and includes information about the user's current game state, such as their score, level, and remaining lives. This event will be triggered every time the user's score changes, advances to a new level, or loses a life.
 
 The second type of event is called the "User Losses" event, which as the name suggests, captures data related to the user's loss in the game. This event is triggered when the player reaches the game-over state.
 
