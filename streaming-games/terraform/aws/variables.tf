@@ -50,3 +50,8 @@ variable "s3_bucket_name" {
   type = string
   default = ""
 }
+
+variable "games_list" {
+  type = set(string)
+  default = ["2048"]
+}

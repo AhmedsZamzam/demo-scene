@@ -4,9 +4,7 @@
 
 ADOCS_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 PRJ_DIR="${ADOCS_FOLDER}/.."
-DOCS_OUT_FOLDER="${PRJ_DIR}/games/docs"
-
-export EXAMPLE="streaming-games"
+DOCS_OUT_FOLDER="${PRJ_DIR}/common/docs"
 
 asciidoctor ${ADOCS_FOLDER}/2048-workshop.adoc -o ${DOCS_OUT_FOLDER}/2048-workshop.html -a stylesheet=stylesheet.css -a imagesdir=images
 sed -i -e "/<title>/r ${DOCS_OUT_FOLDER}/clipboard.html" ${DOCS_OUT_FOLDER}/2048-workshop.html

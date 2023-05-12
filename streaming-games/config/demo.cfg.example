@@ -21,6 +21,8 @@ export TF_VAR_aws_profile="default"
 ###########      Optional Configs      ############
 ###################################################
 
+export TF_VAR_games_list='["2048","pacman"]'
+
 # Fixed name for s3 bucket
 # export TF_VAR_s3_bucket_name="streaming-games-cc"
 
