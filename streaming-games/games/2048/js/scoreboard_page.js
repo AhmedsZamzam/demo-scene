@@ -6,6 +6,6 @@ window.requestAnimationFrame(function () {
     fillScoreboardPage(localStoreManager);
     loadScoreboard(localStoreManager);
 
-    setUpScoreboardDeamonLoader(localStoreManager, 2000, true)
+    setUpScoreboardDeamonLoader(localStoreManager, 1000, true)
 
 });
