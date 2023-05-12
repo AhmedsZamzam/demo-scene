@@ -1233,10 +1233,11 @@ Create</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-sql" data-lang="sql">CREATE STREAM USER_GAME (
-  USER VARCHAR, GAME STRUCT &lt; SCORE INT,
-  LIVES INT, LEVEL INT &gt;
+  USER_KEY STRUCT &lt; USER VARCHAR, GAME_NAME VARCHAR &gt; KEY,
+  GAME STRUCT &lt; SCORE INT, LIVES INT, LEVEL INT &gt;
 ) WITH (
-  KAFKA_TOPIC = 'USER_GAME', VALUE_FORMAT = 'JSON'
+  KAFKA_TOPIC = 'USER_GAME', KEY_FORMAT = 'JSON',
+  VALUE_FORMAT = 'JSON'
 );</code></pre>
 </div>
 </div>
@@ -1245,8 +1246,11 @@ Create</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-sql" data-lang="sql">CREATE STREAM USER_LOSSES (USER VARCHAR) WITH (
-  KAFKA_TOPIC = 'USER_LOSSES', VALUE_FORMAT = 'JSON'
+<pre class="highlight"><code class="language-sql" data-lang="sql">CREATE STREAM USER_LOSSES (
+  USER_KEY STRUCT &lt; USER VARCHAR, GAME_NAME VARCHAR &gt;
+) WITH (
+  KAFKA_TOPIC = 'USER_LOSSES', KEY_FORMAT = 'JSON',
+  VALUE_FORMAT = 'JSON'
 );</code></pre>
 </div>
 </div>
@@ -1261,12 +1265,14 @@ Create</p>
 <div class="content">
 <pre class="highlight"><code class="language-sql" data-lang="sql">CREATE TABLE LOSSES_PER_USER AS
 SELECT
-  USER AS USER,
-  COUNT(USER) AS TOTAL_LOSSES
+  USER_KEY,
+  USER_KEY -&gt; USER AS USER,
+  USER_KEY -&gt; GAME_NAME AS GAME_NAME,
+  COUNT(USER_KEY) AS TOTAL_LOSSES
 FROM
   USER_LOSSES
 GROUP BY
-  USER;</code></pre>
+  USER_KEY;</code></pre>
 </div>
 </div>
 <div class="olist arabic">
@@ -1280,7 +1286,9 @@ GROUP BY
 <div class="content">
 <pre class="highlight"><code class="language-sql" data-lang="sql">CREATE TABLE STATS_PER_USER AS
 SELECT
-  UG.USER AS USER,
+  UG.USER_KEY AS USER_KEY,
+  UG.USER_KEY -&gt; USER AS USER,
+  UG.USER_KEY -&gt; GAME_NAME AS GAME_NAME,
   MAX(UG.GAME -&gt; SCORE) AS HIGHEST_SCORE,
   MAX(UG.GAME -&gt; LEVEL) AS HIGHEST_LEVEL,
   MAX(
@@ -1288,9 +1296,9 @@ SELECT
   ) AS TOTAL_LOSSES
 FROM
   USER_GAME UG
-  LEFT JOIN LOSSES_PER_USER LPU ON UG.USER = LPU.USER
+  LEFT JOIN LOSSES_PER_USER LPU ON UG.USER_KEY = LPU.USER_KEY
 GROUP BY
-  UG.USER;</code></pre>
+  UG.USER_KEY;</code></pre>
 </div>
 </div>
 <div class="olist arabic">
@@ -1304,13 +1312,13 @@ GROUP BY
 <div class="content">
 <pre class="highlight"><code class="language-sql" data-lang="sql">CREATE TABLE SUMMARY_STATS AS
 SELECT
-  'SUMMARY_KEY' AS SUMMARY_KEY,
+  USER_KEY -&gt; GAME_NAME AS GAME_NAME,
   MAX(GAME -&gt; SCORE) AS HIGHEST_SCORE_VALUE,
-  COLLECT_SET(USER) AS USERS_SET_VALUE
+  COLLECT_SET(USER_KEY) AS USERS_SET_VALUE
 FROM
   USER_GAME
 GROUP BY
-  'SUMMARY_KEY';</code></pre>
+  USER_KEY -&gt; GAME_NAME;</code></pre>
 </div>
 </div>
 <div class="olist arabic">

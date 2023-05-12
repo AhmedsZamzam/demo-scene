@@ -202,10 +202,11 @@ Create
 [source,sql]
 ----
 CREATE STREAM USER_GAME (
-  USER VARCHAR, GAME STRUCT < SCORE INT, 
-  LIVES INT, LEVEL INT >
+  USER_KEY STRUCT < USER VARCHAR, GAME_NAME VARCHAR > KEY, 
+  GAME STRUCT < SCORE INT, LIVES INT, LEVEL INT >
 ) WITH (
-  KAFKA_TOPIC = 'USER_GAME', VALUE_FORMAT = 'JSON'
+  KAFKA_TOPIC = 'USER_GAME', KEY_FORMAT = 'JSON', 
+  VALUE_FORMAT = 'JSON'
 );
 ----
 
@@ -213,8 +214,11 @@ CREATE STREAM USER_GAME (
 
 [source,sql]
 ----
-CREATE STREAM USER_LOSSES (USER VARCHAR) WITH (
-  KAFKA_TOPIC = 'USER_LOSSES', VALUE_FORMAT = 'JSON'
+CREATE STREAM USER_LOSSES (
+  USER_KEY STRUCT < USER VARCHAR, GAME_NAME VARCHAR >
+) WITH (
+  KAFKA_TOPIC = 'USER_LOSSES', KEY_FORMAT = 'JSON', 
+  VALUE_FORMAT = 'JSON'
 );
 ----
 
@@ -224,12 +228,14 @@ CREATE STREAM USER_LOSSES (USER VARCHAR) WITH (
 ----
 CREATE TABLE LOSSES_PER_USER AS 
 SELECT 
-  USER AS USER, 
-  COUNT(USER) AS TOTAL_LOSSES 
+  USER_KEY, 
+  USER_KEY -> USER AS USER, 
+  USER_KEY -> GAME_NAME AS GAME_NAME, 
+  COUNT(USER_KEY) AS TOTAL_LOSSES 
 FROM 
   USER_LOSSES 
 GROUP BY 
-  USER;
+  USER_KEY;
 ----
 
 1. Run this query
@@ -238,7 +244,9 @@ GROUP BY
 ----
 CREATE TABLE STATS_PER_USER AS 
 SELECT 
-  UG.USER AS USER, 
+  UG.USER_KEY AS USER_KEY, 
+  UG.USER_KEY -> USER AS USER, 
+  UG.USER_KEY -> GAME_NAME AS GAME_NAME, 
   MAX(UG.GAME -> SCORE) AS HIGHEST_SCORE, 
   MAX(UG.GAME -> LEVEL) AS HIGHEST_LEVEL, 
   MAX(
@@ -246,9 +254,9 @@ SELECT
   ) AS TOTAL_LOSSES 
 FROM 
   USER_GAME UG 
-  LEFT JOIN LOSSES_PER_USER LPU ON UG.USER = LPU.USER 
+  LEFT JOIN LOSSES_PER_USER LPU ON UG.USER_KEY = LPU.USER_KEY 
 GROUP BY 
-  UG.USER;
+  UG.USER_KEY;
 ----
 
 1. Run this query
@@ -257,13 +265,13 @@ GROUP BY
 ----
 CREATE TABLE SUMMARY_STATS AS 
 SELECT 
-  'SUMMARY_KEY' AS SUMMARY_KEY, 
+  USER_KEY -> GAME_NAME AS GAME_NAME, 
   MAX(GAME -> SCORE) AS HIGHEST_SCORE_VALUE, 
-  COLLECT_SET(USER) AS USERS_SET_VALUE 
+  COLLECT_SET(USER_KEY) AS USERS_SET_VALUE 
 FROM 
   USER_GAME 
 GROUP BY 
-  'SUMMARY_KEY';
+  USER_KEY -> GAME_NAME;
 ----
 
 1. Now look at the scoreboard, it should be populated
@@ -300,9 +308,4 @@ The great thing about Cloud resources is that you can spin the up and down with 
 ----
 ./stop.sh
 ----
-
-== Troubleshooting
-
-If you face issues in the 2048 app, try open the developer tools of your browser and watch what errors are in the console.
-If you see a CORS related issue, check your user in AWS IAM, we have seen issues were missing permission would result is this issues. The solution is to add your user to the relevat Groups.
 
