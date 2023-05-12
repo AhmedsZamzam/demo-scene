@@ -1126,7 +1126,7 @@ aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</code></pre>
 </div>
 <div class="imageblock text-left">
 <div class="content">
-<img src="images/arch.png" alt="pac man arch">
+<img src="images/arch.png" alt="arch">
 </div>
 </div>
 <div class="paragraph">
@@ -1335,23 +1335,15 @@ GROUP BY
 <div class="sect2">
 <h3 id="_the_scoreboard_logic">the Scoreboard logic</h3>
 <div class="paragraph">
-<p>ksqlDB supports <a href="https://docs.ksqldb.io/en/0.14.0-ksqldb/concepts/queries/pull/">Pull queries</a>, where you can get the latest value for a given key. The 2048 app uses this feature in order to show you the scoreboard, with a simple trick:</p>
+<p>ksqlDB supports <a href="https://docs.ksqldb.io/en/0.14.0-ksqldb/concepts/queries/pull/">Pull queries</a>, where you can get the latest value for a given key. The 2048 app uses this feature in order to show you the scoreboard:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>A first request is sent to get the SET of all user_id of the players. This collection of strings is calculated in real-time by ksqlDB continously, using a COLLECT_SET aggregated function, as you can see in the <a href="statements.sql">statements.sql</a>). By using a constant as the key for aggregation we are effectively creating an aggregation for all the events in the stream. We can then use this constant string as key in our pull query</p>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT HIGHEST_SCORE_VALUE, USERS_SET_VALUE FROM SUMMARY_STATS WHERE SUMMARY_KEY='SUMMARY_KEY';</code></pre>
-</div>
-</div>
-</li>
-<li>
 <p>A query to the scoreboard is sent using the list retrieved with the first api call in the IN where clause:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-sql" data-lang="sql">select USER, HIGHEST_SCORE, HIGHEST_LEVEL, TOTAL_LOSSES from STATS_PER_USER WHERE USER IN (${userListCsv});</code></pre>
+<pre class="highlight"><code class="language-sql" data-lang="sql">select USER_KEY-&gt;USER, HIGHEST_SCORE, HIGHEST_LEVEL, TOTAL_LOSSES from STATS_PER_USER WHERE GAME_NAME='2048';</code></pre>
 </div>
 </div>
 </li>

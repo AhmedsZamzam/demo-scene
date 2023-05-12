@@ -69,12 +69,11 @@ function loadSummaryStats(gameName,callback) {
 }
 
 
-function getScoreboardJson(gameName,userList,callback) {
-	if(!userList){return;}
+function getScoreboardJson(gameName,callback) {
 
-	var userListCsv = userList.map(user_key => `STRUCT(USER:='${user_key.USER}',GAME_NAME:='${user_key.GAME_NAME}')`).join(',');
+	//var userListCsv = userList.map(user_key => `STRUCT(USER:='${user_key.USER}',GAME_NAME:='${user_key.GAME_NAME}')`).join(',');
 
-	ksqlQuery = `select USER_KEY->USER, HIGHEST_SCORE, HIGHEST_LEVEL, TOTAL_LOSSES from STATS_PER_USER WHERE USER_KEY IN (${userListCsv}) AND GAME_NAME='${gameName}';`;
+	ksqlQuery = `select USER_KEY->USER, HIGHEST_SCORE, HIGHEST_LEVEL, TOTAL_LOSSES from STATS_PER_USER WHERE GAME_NAME='${gameName}';`;
 
 	const request = new XMLHttpRequest();
 	request.onreadystatechange = function() {

@@ -8,14 +8,13 @@ function fillScoreboardPage(storageManager) {
 
 function loadScoreboard(storageManager) {
 	var gameName = storageManager.getGameName();
-	loadSummaryStats(gameName,function(highestScore, usersSet) {
+	
+	getScoreboardJson(gameName, function(playersScores) {
 		
-		getScoreboardJson(gameName, usersSet, function(playersScores) {
-			
-			storageManager.setPlayersScores(playersScores);
-			
-		});
+		storageManager.setPlayersScores(playersScores);
+		
 	});
+	
 
 }
 

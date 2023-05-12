@@ -279,21 +279,13 @@ GROUP BY
 image::scoreboard.png[]
 
 === the Scoreboard logic
-ksqlDB supports link:https://docs.ksqldb.io/en/0.14.0-ksqldb/concepts/queries/pull/[Pull queries], where you can get the latest value for a given key. The 2048 app uses this feature in order to show you the scoreboard, with a simple trick:
+ksqlDB supports link:https://docs.ksqldb.io/en/0.14.0-ksqldb/concepts/queries/pull/[Pull queries], where you can get the latest value for a given key. The 2048 app uses this feature in order to show you the scoreboard:
 
-1. A first request is sent to get the SET of all user_id of the players. This collection of strings is calculated in real-time by ksqlDB continously, using a COLLECT_SET aggregated function, as you can see in the link:statements.sql[statements.sql]). By using a constant as the key for aggregation we are effectively creating an aggregation for all the events in the stream. We can then use this constant string as key in our pull query
+1. A query to the scoreboard is sent using the list retrieved with the first api call in the IN where clause: 
 +
 [source,sql]
 ----
-SELECT HIGHEST_SCORE_VALUE, USERS_SET_VALUE FROM SUMMARY_STATS WHERE SUMMARY_KEY='SUMMARY_KEY';
-----
-
-
-2. A query to the scoreboard is sent using the list retrieved with the first api call in the IN where clause: 
-+
-[source,sql]
-----
-select USER, HIGHEST_SCORE, HIGHEST_LEVEL, TOTAL_LOSSES from STATS_PER_USER WHERE USER IN (${userListCsv});
+select USER_KEY->USER, HIGHEST_SCORE, HIGHEST_LEVEL, TOTAL_LOSSES from STATS_PER_USER WHERE GAME_NAME='2048';
 ----
 
 
