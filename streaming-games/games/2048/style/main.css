@@ -63,7 +63,7 @@ h1.title {
   #scoreboard table td {
     padding: 15px; }
   #scoreboard table th {
-    background-color: #002b3c;
+    background-color: #0074A2;
     color: #ffffff;
     font-weight: bold;
     font-size: 13px;
@@ -74,7 +74,7 @@ h1.title {
   #scoreboard table tbody tr {
     background-color: white; }
   #scoreboard table tbody tr:nth-child(odd) {
-    background-color: #a9baff; }
+    background-color: #6fd6ff; }
 
 .score-container, .best-container {
   position: relative;

@@ -70,34 +70,6 @@ LocalStorageManager.prototype.setUsername = function (username) {
   this.storage.setItem(this.usernameKey, username);
 };
 
-// Best score getters/setters
-LocalStorageManager.prototype.getBestScore = function () {
-  var gameName = this.getGameName();
-  return this.storage.getItem(gameName+"_"+this.bestScoreKey) || 0;
-};
-
-LocalStorageManager.prototype.setBestScore = function (score) {
-  var gameName = this.getGameName();
-  this.storage.setItem(gameName+"_"+this.bestScoreKey, score);
-};
-
-// Game state getters/setters and clearing
-LocalStorageManager.prototype.getGameState = function () {
-  var gameName = this.getGameName();
-  var stateJSON = this.storage.getItem(gameName+"_"+this.gameStateKey);
-  return stateJSON ? JSON.parse(stateJSON) : null;
-};
-
-LocalStorageManager.prototype.setGameState = function (gameState) {
-  var gameName = this.getGameName();
-  this.storage.setItem(gameName+"_"+this.gameStateKey, JSON.stringify(gameState));
-};
-
-LocalStorageManager.prototype.clearGameState = function () {
-  var gameName = this.getGameName();
-  this.storage.removeItem(gameName+"_"+this.gameStateKey);
-};
-
 // PlayersScore getters/setters 
 LocalStorageManager.prototype.getPlayersScores = function () {
   var gameName = this.getGameName();
@@ -108,5 +80,40 @@ LocalStorageManager.prototype.setPlayersScores = function (playersScores) {
   var gameName = this.getGameName();
   this.storage.setItem(gameName+"_"+this.playersScoresKey, JSON.stringify(playersScores));
 };
+
+
+// Best score getters/setters
+LocalStorageManager.prototype.getBestScore = function () {
+  var gameName = this.getGameName();
+  var username = this.getUsername();
+  return this.storage.getItem(gameName+"_"+username+"_"+this.bestScoreKey) || 0;
+};
+
+LocalStorageManager.prototype.setBestScore = function (score) {
+  var gameName = this.getGameName();
+  var username = this.getUsername();
+  this.storage.setItem(gameName+"_"+username+"_"+this.bestScoreKey, score);
+};
+
+// Game state getters/setters and clearing
+LocalStorageManager.prototype.getGameState = function () {
+  var gameName = this.getGameName();
+  var username = this.getUsername();
+  var stateJSON = this.storage.getItem(gameName+"_"+username+"_"+this.gameStateKey);
+  return stateJSON ? JSON.parse(stateJSON) : null;
+};
+
+LocalStorageManager.prototype.setGameState = function (gameState) {
+  var gameName = this.getGameName();
+  var username = this.getUsername();
+  this.storage.setItem(gameName+"_"+username+"_"+this.gameStateKey, JSON.stringify(gameState));
+};
+
+LocalStorageManager.prototype.clearGameState = function () {
+  var gameName = this.getGameName();
+  var username = this.getUsername();
+  this.storage.removeItem(gameName+"_"+username+"_"+this.gameStateKey);
+};
+
 
 
