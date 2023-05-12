@@ -57,24 +57,24 @@ h1.title {
   text-align: right; }
 
 #scoreboard table {
-  background: #eee4da;
+  background: #F5F7FF;
   border-collapse: collapse;
   width: 500px; }
   #scoreboard table td {
     padding: 15px; }
-  #scoreboard table thead td {
+  #scoreboard table th {
     background-color: #002b3c;
     color: #ffffff;
     font-weight: bold;
     font-size: 13px;
-    border: 1px solid rgba(238, 228, 218, 0.5); }
+    border: 1px solid rgba(245, 247, 255, 0.5); }
   #scoreboard table tbody td {
     color: #080a60;
     border: 1px solid #f9f6f2; }
   #scoreboard table tbody tr {
     background-color: white; }
   #scoreboard table tbody tr:nth-child(odd) {
-    background-color: #eee4da; }
+    background-color: #a9baff; }
 
 .score-container, .best-container {
   position: relative;
@@ -98,7 +98,7 @@ h1.title {
     font-size: 13px;
     line-height: 13px;
     text-align: center;
-    color: #eee4da; }
+    color: #F5F7FF; }
   .score-container .score-addition, .best-container .score-addition {
     position: absolute;
     right: 30px;
@@ -186,7 +186,7 @@ hr {
     right: 0;
     bottom: 0;
     left: 0;
-    background: rgba(238, 228, 218, 0.5);
+    background: rgba(245, 247, 255, 0.5);
     z-index: 100;
     text-align: center;
     -webkit-animation: fade-in 800ms ease 1200ms;
@@ -243,7 +243,7 @@ hr {
   margin-right: 15px;
   float: left;
   border-radius: 3px;
-  background: rgba(238, 228, 218, 0.35); }
+  background: rgba(245, 247, 255, 0.35); }
   .grid-cell:last-child {
     margin-right: 0; }
 
@@ -346,40 +346,39 @@ hr {
   transition-property: transform; }
   .tile .tile-inner {
     border-radius: 3px;
-    background: #eee4da;
+    background: #F5F7FF;
     text-align: center;
     font-weight: bold;
     z-index: 10;
     font-size: 55px; }
   .tile.tile-2 .tile-inner {
-    background: #eee4da;
+    background: #f5f7ff;
     box-shadow: 0 0 30px 10px rgba(77, 184, 255, 0), inset 0 0 0 1px rgba(255, 255, 255, 0); }
   .tile.tile-4 .tile-inner {
-    background: #d6ddde;
+    background: #ddeeff;
     box-shadow: 0 0 30px 10px rgba(77, 184, 255, 0), inset 0 0 0 1px rgba(255, 255, 255, 0); }
   .tile.tile-8 .tile-inner {
     color: #f9f6f2;
-    background: #bed5e1;
-    box-shadow: 0 0 30px 10px rgba(77, 184, 255, 0), inset 0 0 0 1px rgba(255, 255, 255, 0); }
+    background: #83dbff; }
   .tile.tile-16 .tile-inner {
     color: #f9f6f2;
-    background: #4bc7f3; }
+    background: #4dcdff; }
   .tile.tile-32 .tile-inner {
     color: #f9f6f2;
-    background: #4099c2; }
+    background: #429ecc; }
   .tile.tile-64 .tile-inner {
     color: #f9f6f2;
-    background: #417bbf; }
+    background: #427fc7; }
   .tile.tile-128 .tile-inner {
     color: #f9f6f2;
-    background: #4b65ee;
+    background: #4c68f5;
     font-size: 45px; }
     @media screen and (max-width: 520px) {
       .tile.tile-128 .tile-inner {
         font-size: 25px; } }
   .tile.tile-256 .tile-inner {
     color: #f9f6f2;
-    background: #47b0f4;
+    background: #4ab5ff;
     box-shadow: 0 0 30px 10px rgba(77, 184, 255, 0.3174603175), inset 0 0 0 1px rgba(255, 255, 255, 0.1904761905);
     font-size: 45px; }
     @media screen and (max-width: 520px) {
@@ -387,7 +386,7 @@ hr {
         font-size: 25px; } }
   .tile.tile-512 .tile-inner {
     color: #f9f6f2;
-    background: #30a8f8;
+    background: #31acff;
     box-shadow: 0 0 30px 10px rgba(77, 184, 255, 0.3968253968), inset 0 0 0 1px rgba(255, 255, 255, 0.2380952381);
     font-size: 45px; }
     @media screen and (max-width: 520px) {
@@ -395,7 +394,7 @@ hr {
         font-size: 25px; } }
   .tile.tile-1024 .tile-inner {
     color: #f9f6f2;
-    background: #18a1fb;
+    background: #19a2ff;
     box-shadow: 0 0 30px 10px rgba(77, 184, 255, 0.4761904762), inset 0 0 0 1px rgba(255, 255, 255, 0.2857142857);
     font-size: 35px; }
     @media screen and (max-width: 520px) {
@@ -562,6 +561,13 @@ hr {
   #scoreboard table {
     width: 280px; }
 
+  h1.title img {
+    width: 30px;
+    height: 30px;
+    margin-bottom: -5px;
+    margin-left: -2px;
+    margin-right: -2px; }
+
   html, body {
     font-size: 15px; }
 
@@ -624,7 +630,7 @@ hr {
       right: 0;
       bottom: 0;
       left: 0;
-      background: rgba(238, 228, 218, 0.5);
+      background: rgba(245, 247, 255, 0.5);
       z-index: 100;
       text-align: center;
       -webkit-animation: fade-in 800ms ease 1200ms;
@@ -681,7 +687,7 @@ hr {
     margin-right: 10px;
     float: left;
     border-radius: 3px;
-    background: rgba(238, 228, 218, 0.35); }
+    background: rgba(245, 247, 255, 0.35); }
     .grid-cell:last-child {
       margin-right: 0; }
 

@@ -12,7 +12,7 @@ $mobile-threshold: $field-width + 20px;
 $text-color: lighten(#040531, 10%);
 $bright-text-color: #f9f6f2;
 
-$tile-color: #eee4da;
+$tile-color:#F5F7FF;
 $tile-gold-color: #0099FF;
 $tile-gold-glow-color: lighten($tile-gold-color, 15%);
 
@@ -88,7 +88,7 @@ h1.title {
       padding: 15px;
     }
 
-    thead td {
+    th {
       background-color: darken($game-container-background, 20%);
       color: #ffffff;
       font-weight: bold;
@@ -104,7 +104,7 @@ h1.title {
         background-color: lighten($tile-color, 15%);
       }
       tr:nth-child(odd) {
-        background-color: $tile-color;
+        background-color: darken($tile-color,15%);
       }
     } 
   }
@@ -384,7 +384,7 @@ hr {
   // Colors for all 11 states, false = no special color
   $special-colors: false false, // 2
                    false false, // 4
-                   false true, // 8
+                   lighten(#00C2FF,15%) true, // 8
                    #00C2FF true, // 16
                    #0074A2 true, // 32
                    #14449A true, // 64
@@ -539,6 +539,14 @@ hr {
     table {
       width: $field-width;
     }
+  }
+
+  h1.title img {
+    width: 30px;
+    height: 30px;
+    margin-bottom: -5px;
+    margin-left: -2px;
+    margin-right: -2px;
   }
 
   html, body {

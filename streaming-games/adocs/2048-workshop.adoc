@@ -1,10 +1,21 @@
-= Streaming Pac-Man
+= Streaming Games
+:doctype: book
+:toc:
+:toc-title: Table of Contents
+:toclevels: 1
+:experimental:
+:icons: font
+:imagesdir: ./images
+:externalip: localhost
+:dc: dc
+:feedbackformurl: 
+:nofooter:
 
 :imagesdir: images/
 
-*Streaming Pac-Man* is the funniest application that you ever see while applying principles of streaming analytics using https://kafka.apache.org[Apache Kafka]. Built around the famous Pac-Man game, this application ingest and store events from the game into Kafka topics and allow you to process them in near real-time using https://ksqldb.io/[ksqlDB]. In order to keep you focused this application is based on fully managed services in Confluent Cloud for both the Kafka cluster as well as ksqlDB.
+*Streaming Games* is the funniest application that you ever see while applying principles of streaming analytics using https://confluent.cloud[Confluent Cloud]. Built around the different games, this application ingest and store events from the game into Kafka topics and allow you to process them in near real-time using https://ksqldb.io/[ksqlDB]. In order to keep you focused this application is based on fully managed services in Confluent Cloud for both the Apache Kafka cluster as well as ksqlDB.
 
-image::2048.png[]
+image::2048.jpg[2048,300,386]
 
 To implement streaming analytics in the game we built a  link:statements.sql[scoreboard using ksqlDB]. The scoreboard will be a table containing aggregated metrics of the players such as their highest score, the highest level achieved, and the number of times that the player loses. As new events arrive the scoreboard gets instantly updated by the continuous queries that keep processing those events as they happen.
 
@@ -18,7 +29,14 @@ To implement streaming analytics in the game we built a  link:statements.sql[sco
 * *AWS account* - This demo/Workshop runs on AWS
 
 
-== PRE-WORK: Step 1. Install workshop dependencies
+== PRE-WORK: 
+
+[IMPORTANT]
+====
+Follow this part carefully before the workshop!
+====
+
+=== Step 1. Install workshop dependencies
 
 Run the following command to install workshop dependencies
 [source,bash]
@@ -31,14 +49,14 @@ confluent-cli
 ----
 
 
-== PRE-WORK: Step 2. Signup for Confluent Cloud
+=== Step 2. Signup for Confluent Cloud
 
 You can Create a Confluent Cloud Account following this link: https://www.confluent.io/confluent-cloud/tryfree/?utm_campaign=tm.campaigns_cd.Q223_EMEA_AWS-Pacman-Workshop&utm_source=marketo&utm_medium=workshop[Try Confluent Cloud For Free (Games Workshop)]
 
 If you want to create a Confluent Cloud account from the *AWS Marketplace*, follow this link:
 https://www.confluent.io/partner/amazon-web-services/?utm_campaign=tm.campaigns_cd.mp-workshop-pacman-emea-awsmarketplace&utm_medium=marketingemail[Try Confluent Cloud For Free - Sign up from AWS Marketplace (Games Workshop)]
 
-=== PRE-WORK: Step 2a. Create a Cloud API Key
+==== Step 2a. Create a Cloud API Key
 
 1. Open the https://confluent.cloud/settings/api-keys/create[Confluent Cloud Console] and click **Granular access** tab, and then click **Next**.
 2. Click **Create a new one to create** tab. Enter the new service account name (`tf_runner`), then click **Next**.
@@ -47,7 +65,7 @@ https://www.confluent.io/partner/amazon-web-services/?utm_campaign=tm.campaigns_
 
 image::https://github.com/confluentinc/terraform-provider-confluent/raw/master/docs/images/OrganizationAdmin.png[Assigning the OrganizationAdmin role to tf_runner service account]
 
-=== PRE-WORK: Step 2b. Configure the Confluent CLI
+==== Step 2b. Configure the Confluent CLI
 
 1. Log in to the Confluent Cloud CLI:
 
@@ -87,7 +105,7 @@ Run the following steps to configure the workshop
 cp config/demo.cfg.example config/demo.cfg
 ----
 
-2. Provide the required information on the 'demo.cfg' file
+1. Provide the required information on the 'demo.cfg' file
 
 [source,bash]
 ----
@@ -101,7 +119,7 @@ export TF_VAR_confluent_cloud_api_secret="<CONFLUENT_CLOUD_API_SECRET>"
 we advice using the utility https://github.com/Nike-Inc/gimme-aws-creds[gimme-aws-creds] if you use Okta to login in AWS. You can also use the [granted](https://granted.dev/) CLI for AWS creds. 
 Amend any of the config as you see fit for your preference (Like the aws region or Schema registry Region)
 
-3. If you are not using gimme-aws-creds, create a credential file as described https://registry.terraform.io/providers/hashicorp/aws/latest/docs#shared-configuration-and-credentials-files[here]. 
+1. If you are not using gimme-aws-creds, create a credential file as described https://registry.terraform.io/providers/hashicorp/aws/latest/docs#shared-configuration-and-credentials-files[here]. 
 The file in ``~/.aws/credentials`` should look like this (An example below)
 
 [source,bash]
@@ -112,7 +130,7 @@ aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 ----
 You can set ``TF_VAR_aws_profile="default"`` in the ``demo.cfg`` file
 
-4. Notice the optional configuration in the same file. Uncomment and define as you see fit
+1. Notice the optional configuration in the same file. Uncomment and define as you see fit
 
 [source,bash]
 ----
@@ -136,7 +154,7 @@ Please note that during deployment, the script takes care of creating the requir
 ./start.sh
 ----
 
-2. At the end of the provisioning the Output with the demo endpoint will be shown. Paste the demo url in your browser and start playing!
+1. At the end of the provisioning the Output with the demo endpoint will be shown. Paste the demo url in your browser and start playing!
 
 [source,bash]
 ----
@@ -214,7 +232,7 @@ GROUP BY
   USER;
 ----
 
-2. 
+1. Run this query
 
 [source,sql]
 ----
@@ -233,7 +251,7 @@ GROUP BY
   UG.USER;
 ----
 
-3. 
+1. Run this query
 
 [source,sql]
 ----
@@ -248,7 +266,7 @@ GROUP BY
   'SUMMARY_KEY';
 ----
 
-4. Now look at the scoreboard, it should be populated
+1. Now look at the scoreboard, it should be populated
 
 image::scoreboard.png[]
 
