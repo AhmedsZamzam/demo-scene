@@ -27,8 +27,10 @@ function play() {
         return;
     }
     if (!selected_game) {
-        alert('You need to select a game.');
-        return;
+        //Using a default to let people play a game if the input doesn't show up...
+        selected_game = GAMES_LIST[0];
+        /*alert('You need to select a game.');
+        return;*/
     }
     localStoreManager.setUsername(user);
     localStoreManager.setGameName(selected_game);
