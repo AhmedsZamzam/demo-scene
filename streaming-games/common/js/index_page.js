@@ -7,7 +7,7 @@ window.requestAnimationFrame(function () {
 
 function checkName() {
     var username = localStoreManager.getUsername();
-    if (username != null | username.length > 0) {
+    if (username != null || username.length > 0) {
         document.getElementById("user").value = username;
     }
     
