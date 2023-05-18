@@ -43,31 +43,6 @@ function loadHighestScore(gameName, user, ctx, callback ) {
 
 }
 
-function loadSummaryStats(gameName,callback) {
-
-	var highestScore;
-	var usersSet;
-	
-	ksqlQuery = `SELECT HIGHEST_SCORE_VALUE, USERS_SET_VALUE FROM SUMMARY_STATS WHERE GAME_NAME='${gameName}';`;
-
-	var request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-        if (this.readyState == 4) {
-			if (this.status == 200) {
-				var result = JSON.parse(this.responseText);
-				if (result[1] != undefined || result[1] != null) {
-					var row = result[1];
-					highestScore = row[0];
-					usersSet = row[1];
-				}
-            }
-            callback(highestScore, usersSet);
-		}
-	};
-	sendksqlDBQuery(request, ksqlQuery);
-
-}
-
 
 function getScoreboardJson(gameName,callback) {
 

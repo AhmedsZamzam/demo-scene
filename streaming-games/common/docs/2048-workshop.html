@@ -1303,26 +1303,6 @@ GROUP BY
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Run this query</p>
-</li>
-</ol>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-sql" data-lang="sql">CREATE TABLE SUMMARY_STATS AS
-SELECT
-  USER_KEY -&gt; GAME_NAME AS GAME_NAME,
-  MAX(GAME -&gt; SCORE) AS HIGHEST_SCORE_VALUE,
-  COLLECT_SET(USER_KEY) AS USERS_SET_VALUE
-FROM
-  USER_GAME
-GROUP BY
-  USER_KEY -&gt; GAME_NAME;</code></pre>
-</div>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
 <p>Now look at the scoreboard, it should be populated</p>
 </li>
 </ol>

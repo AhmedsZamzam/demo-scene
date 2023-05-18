@@ -259,21 +259,6 @@ GROUP BY
   UG.USER_KEY;
 ----
 
-1. Run this query
-
-[source,sql]
-----
-CREATE TABLE SUMMARY_STATS AS 
-SELECT 
-  USER_KEY -> GAME_NAME AS GAME_NAME, 
-  MAX(GAME -> SCORE) AS HIGHEST_SCORE_VALUE, 
-  COLLECT_SET(USER_KEY) AS USERS_SET_VALUE 
-FROM 
-  USER_GAME 
-GROUP BY 
-  USER_KEY -> GAME_NAME;
-----
-
 1. Now look at the scoreboard, it should be populated
 
 image::scoreboard.png[]
