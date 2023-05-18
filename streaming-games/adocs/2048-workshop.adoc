@@ -105,7 +105,10 @@ Run the following steps to configure the workshop
 cp config/demo.cfg.example config/demo.cfg
 ----
 
+[start=2]
+
 1. Provide the required information on the 'demo.cfg' file
+
 
 [source,bash]
 ----
@@ -118,8 +121,8 @@ export TF_VAR_confluent_cloud_api_secret="<CONFLUENT_CLOUD_API_SECRET>"
 
 we advice using the utility https://github.com/Nike-Inc/gimme-aws-creds[gimme-aws-creds] if you use Okta to login in AWS. You can also use the [granted](https://granted.dev/) CLI for AWS creds. 
 Amend any of the config as you see fit for your preference (Like the aws region or Schema registry Region)
-
-1. If you are not using gimme-aws-creds, create a credential file as described https://registry.terraform.io/providers/hashicorp/aws/latest/docs#shared-configuration-and-credentials-files[here]. 
+[start=3]
+3. If you are not using gimme-aws-creds, create a credential file as described https://registry.terraform.io/providers/hashicorp/aws/latest/docs#shared-configuration-and-credentials-files[here]. 
 The file in ``~/.aws/credentials`` should look like this (An example below)
 
 [source,bash]
@@ -129,8 +132,8 @@ aws_access_key_id=AKIAIOSFODNN7EXAMPLE
 aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 ----
 You can set ``TF_VAR_aws_profile="default"`` in the ``demo.cfg`` file
-
-1. Notice the optional configuration in the same file. Uncomment and define as you see fit
+[start=4]
+4. Notice the optional configuration in the same file. Uncomment and define as you see fit
 
 [source,bash]
 ----
@@ -153,8 +156,8 @@ Please note that during deployment, the script takes care of creating the requir
 ----
 ./start.sh
 ----
-
-1. At the end of the provisioning the Output with the demo endpoint will be shown. Paste the demo url in your browser and start playing!
+[start=2]
+2. At the end of the provisioning the Output with the demo endpoint will be shown. Paste the demo url in your browser and start playing!
 
 [source,bash]
 ----
@@ -197,30 +200,6 @@ Now that the data is flowing into Confluent, we can create the ksqlDB queries th
 
 To implement the pipeline we use ksqlDB. Run the following queries in your ksqlDB instance in Confluent Cloud
 
-*TO BE REMOVED and added to provision stage*
-Create
-[source,sql]
-----
-CREATE STREAM USER_GAME (
-  USER_KEY STRUCT < USER VARCHAR, GAME_NAME VARCHAR > KEY, 
-  GAME STRUCT < SCORE INT, LIVES INT, LEVEL INT >
-) WITH (
-  KAFKA_TOPIC = 'USER_GAME', KEY_FORMAT = 'JSON', 
-  VALUE_FORMAT = 'JSON'
-);
-----
-
-*TO BE REMOVED and added to provision stage*
-
-[source,sql]
-----
-CREATE STREAM USER_LOSSES (
-  USER_KEY STRUCT < USER VARCHAR, GAME_NAME VARCHAR >
-) WITH (
-  KAFKA_TOPIC = 'USER_LOSSES', KEY_FORMAT = 'JSON', 
-  VALUE_FORMAT = 'JSON'
-);
-----
 
 1. Create a table to count the number of losses for each player.
 
@@ -237,8 +216,8 @@ FROM
 GROUP BY 
   USER_KEY;
 ----
-
-1. Run this query
+[start=2]
+2. Run this query
 
 [source,sql]
 ----
@@ -258,15 +237,14 @@ FROM
 GROUP BY 
   UG.USER_KEY;
 ----
-
-1. Now look at the scoreboard, it should be populated
+[start=3]
+3. Now look at the scoreboard, it should be populated
 
 image::scoreboard.png[]
-
 === the Scoreboard logic
 ksqlDB supports link:https://docs.ksqldb.io/en/0.14.0-ksqldb/concepts/queries/pull/[Pull queries], where you can get the latest value for a given key. The 2048 app uses this feature in order to show you the scoreboard:
-
-1. A query to the scoreboard is sent using the list retrieved with the first api call in the IN where clause: 
+[start=4]
+4. A query to the scoreboard is sent using the list retrieved with the first api call in the IN where clause: 
 +
 [source,sql]
 ----
